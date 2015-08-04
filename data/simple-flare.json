@@ -1,0 +1,68 @@
+{
+ "name": "flare",
+ "number":70,
+ "children": [
+  {
+   "name": "analytics",
+   "number": 200,
+   "children": [
+    {
+     "name": "cluster",
+     "number": 100,
+     "children": [
+      {"name": "AgglomerativeCluster", "number": 80,"size": 3938},
+      {"name": "CommunityStructure", "number": 100,"size": 3812},
+      {"name": "MergeEdge", "number": 200, "size": 743}
+     ]
+    },
+    {
+     "name": "graph",
+     "number": 200,
+     "children": [
+      {"name": "BetweennessCentrality", "number": 200,"size": 3534},
+      {"name": "LinkDistance", "number": 200,"size": 5731}
+     ]
+    },
+    {
+     "name": "optimization",
+     "number": 200,
+     "children": [
+      {"name": "AspectRatioBanker", "number": 200,"size": 7074}
+     ]
+    }
+   ]
+  },
+  {
+   "name": "animate",
+   "number": 200,
+   "children": [
+    {"name": "Easing", "number": 200,"size": 17010},
+    {"name": "FunctionSequence", "number": 200,"size": 5842},
+    {
+     "name": "interpolate",
+     "number": 200,
+     "children": [
+      {"name": "ArrayInterpolator", "number": 200, "size": 1983},
+      {"name": "ColorInterpolator", "number": 300,"size": 2047},
+      {"name": "DateInterpolator", "number": 70, "size": 1375},
+      {"name": "Interpolator", "number": 20, "size": 8746},
+      {"name": "MatrixInterpolator", "number": 200,"size": 2202},
+      {"name": "NumberInterpolator", "number": 200,"size": 1382},
+      {"name": "ObjectInterpolator", "number": 200,"size": 1629},
+      {"name": "PointInterpolator", "number": 200,"size": 1675},
+      {"name": "RectangleInterpolator", "number": 2,"size": 2042}
+     ]
+    },
+    {"name": "ISchedulable", "number": 80,"size": 1041},
+    {"name": "Parallel", "number": 20,"size": 5176},
+    {"name": "Pause", "number": 100,"size": 449},
+    {"name": "Scheduler", "number": 200,"size": 5593},
+    {"name": "Sequence", "number": 20,"size": 5534},
+    {"name": "Transition", "number": 200,"size": 9201},
+    {"name": "Transitioner", "number": 2,"size": 19975},
+    {"name": "TransitionEvent", "number": 10,"size": 1116},
+    {"name": "Tween", "number": 2,"size": 6006}
+   ]
+  }
+ ]
+}
