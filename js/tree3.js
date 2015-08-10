@@ -40,9 +40,10 @@ function tree() {
             .projection(function(d) { return [d.y, d.x];});
         
         // if(vis) vis.remove();
-        d3.selectAll('svg').remove();
+        d3.selectAll('svg.tree_svg').remove();
         // if(!vis) {
             vis = d3.select('#body').append('svg:svg')
+                .attr('class', 'tree_svg')
                 .attr('width', config.w + config.m.left + config.m.right)
                 .attr('height', config.h + config.m.top + config.m.bottom)
                 .append('svg:g')

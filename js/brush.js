@@ -1,5 +1,7 @@
 function windowSlip(config){
   var config = config;
+  var period_window  = config.initialBrushSize;
+
   var x = d3.time.scale()
       .domain(config.domainRange)
       .range([0, config.width]);
@@ -9,11 +11,12 @@ function windowSlip(config){
       .extent(config.initialBrushSize)
       .on("brush", brushed);
 
-  // var svg = d3.select("#body").append("svg")
-  //     .attr("width", 960)
-  //     .attr("height", 500)
-  //     .append("g")
-  //     .attr("transform", "translate(" + 40 + "," + 200 + ")");
+  var svg = d3.select("#body").append("svg")
+      .attr("class", "brush_svg")
+      .attr("width", 960)
+      .attr("height", 500)
+      .append("g")
+      .attr("transform", "translate(" + 40 + "," + 50 + ")");
 
   svg.append("rect")//背景矩形
       .attr("class", "grid-background")
@@ -80,8 +83,10 @@ function windowSlip(config){
         extent1[1] = d3.time.day.ceil(extent0[1]);
       }
     }
-
+    period_window = extent1;
     d3.select(this).call(brush.extent(extent1));
     config.onChange({d3Event: d3.event});
   }
+
+  return period_window;
 }

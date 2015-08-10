@@ -8,7 +8,7 @@
 <script type="text/javascript" src="../data/simple-flare.js"></script>
 
 
-<style>
+<style type="text/css">
 
 .axis text {
   font: 11px sans-serif;
@@ -97,17 +97,11 @@ path.link {
     <div id="body">
       <div id="footer">
         d3.layout.tree
-        <div class="hint">click or option-click to expand or collapse</div>
       </div>
-
-        <!-- <div class="button-group">
-          <button onclick ="simpleflare2()"> data2</button>
-          <button onclick ="simpleflare1()"> data1</button>
-        </div> -->
     </div>
-<script>
+<script type = "text/javascript">
 
-var config = {
+var brushConfig = {
   domainRange: [new Date(2013, 0, 1), new Date(2013, 0, 15) - 1],
   initialBrushSize: [new Date(2013, 0, 2), new Date(2013, 0, 3)],
   onChange: function(event) {
@@ -115,22 +109,31 @@ var config = {
   },
   width: 960,
   height: 100,
-  margin: {top: 200, right: 40, bottom: 200, left: 40},
+  margin: {top: 200, right: 40, bottom: 10, left: 40},
   axis: {ticks : {unit: d3.time.hours, value:12}},
   brush: {ticks: {unit: d3.time.days, value:1}} 
 }
 
 var chart = tree();
 var chartConfig = {
-          svg_width: 1600,
+          svg_width: 1000,
           svg_height: 800,
           margins: {top: 30, left: 120, right: 30, bottom: 30},
           path : true
-      };
+};
+simpleflare1();
+windowSlip(brushConfig)
 
 
-windowSlip(config);
-// simpleflare1();
+// var period = windowSlip(brushConfig);
+// if(period == brushConfig.initialBrushSize){
+// 	simpleflare1();
+// }
+// else{
+// 	simpleflare2();
+// }
+
+
 
 
 function simpleflare1(){
