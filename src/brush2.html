@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+
+<script src="../lib/d3.js"></script>
+<script type="text/javascript" src="../js/brush.js"></script>
+<script type="text/javascript" src="../js/tree3.js"></script>
+<script type="text/javascript" src="../data/simple-flare.js"></script>
+
+
+<style>
+
+.axis text {
+  font: 11px sans-serif;
+}
+
+.axis path {
+  display: none;
+}
+
+.axis line {
+  fill: none;
+  stroke: blue;
+  shape-rendering: crispEdges;
+}
+
+.grid-background {
+  fill: gray;
+}
+
+.grid line,
+.grid path {
+  fill: none;
+  stroke: red;
+  shape-rendering: crispEdges;
+}
+/*定义grid样式*/
+.grid .minor.tick line {
+  stroke-opacity: .5;
+}
+
+.brush .extent {
+  stroke: #000;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}
+
+.node circle {
+  cursor: pointer;
+  fill: red;
+  /*stroke: steelblue;*/
+  stroke-width: 1.5px;
+}
+
+.node text {
+  font-size: 11px;
+  text-shadow: 0.5em 0.2em 0.3em white,-0.5em 0.2em 0.3em white;
+}
+
+path.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+.info_box {
+  position: absolute;
+  padding: 10px 15px;
+  border: 2px solid gray;
+  background: white;
+  
+  
+}
+
+.angular {
+
+  position: absolute;
+  top:-6px;
+  left: 20px;
+  width:6px;
+  height: 6px;
+  background:  rgb(255, 255, 255);
+  border-top: solid 2px gray;
+  border-left: solid 2px gray;
+  transform: rotate(45deg);
+
+}
+
+.rect_box {
+  background: white;
+
+}
+
+</style>
+</head>
+<body>
+    <div id="body">
+      <div id="footer">
+        d3.layout.tree
+        <div class="hint">click or option-click to expand or collapse</div>
+      </div>
+
+        <!-- <div class="button-group">
+          <button onclick ="simpleflare2()"> data2</button>
+          <button onclick ="simpleflare1()"> data1</button>
+        </div> -->
+    </div>
+<script>
+
+var config = {
+  domainRange: [new Date(2013, 0, 1), new Date(2013, 0, 15) - 1],
+  initialBrushSize: [new Date(2013, 0, 2), new Date(2013, 0, 3)],
+  onChange: function(event) {
+    console.log(event);
+  },
+  width: 960,
+  height: 100,
+  margin: {top: 200, right: 40, bottom: 200, left: 40},
+  axis: {ticks : {unit: d3.time.hours, value:12}},
+  brush: {ticks: {unit: d3.time.days, value:1}} 
+}
+
+var chart = tree();
+var chartConfig = {
+          svg_width: 1600,
+          svg_height: 800,
+          margins: {top: 30, left: 120, right: 30, bottom: 30},
+          path : true
+      };
+
+
+windowSlip(config);
+// simpleflare1();
+
+
+function simpleflare1(){
+  simpleflare(chartConfig, chart, data1);
+}
+
+function simpleflare2(){
+  simpleflare(chartConfig, chart, data2);
+}
+
+function simpleflare(chartConfig, chart, data){
+  chart.nodes(data).config(chartConfig).render();
+}
+
+
+</script>
+</body>
+</html>

@@ -1,78 +1,5 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-    <script type="text/javascript" src="../../lib/d3.js"></script>
-     <script type="text/javascript" src="../../lib/d3.layout.js"></script>
-    <style type="text/css">
 
-
-
-.node circle {
-  cursor: pointer;
-  fill: red;
-  /*stroke: steelblue;*/
-  stroke-width: 1.5px;
-}
-
-.node text {
-  font-size: 11px;
-  text-shadow: 0.5em 0.2em 0.3em white,-0.5em 0.2em 0.3em white;
-}
-
-path.link {
-  fill: none;
-  stroke: #ccc;
-  stroke-width: 1.5px;
-}
-
-.info_box {
-  position: absolute;
-  padding: 10px 15px;
-  border: 2px solid gray;
-  background: white;
-  
-  
-}
-
-.angular {
-
-  position: absolute;
-  top:-6px;
-  left: 20px;
-  width:6px;
-  height: 6px;
-  background:  rgb(255, 255, 255);
-  border-top: solid 2px gray;
-  border-left: solid 2px gray;
-  transform: rotate(45deg);
-
-}
-
-.rect_box {
-  background: white;
-
-}
-
-    </style>
-  </head>
-  <body>
-    <div id="body">
-      <div id="footer">
-        d3.layout.tree
-        <div class="hint">click or option-click to expand or collapse</div>
-      </div>
-
-        <div class="button-group">
-          <button onclick ="simpleflare2()"> data2</button>
-          <button onclick ="simpleflare1()"> data1</button>
-        </div>
-    </div>
-    <script type="text/javascript" src="../../js/tree3.js">
-    </script>
-    <script type="text/javascript">
-
-var data1 ={
+var data1 = {
  "name": "flare",
  // "number":800,
  // "duration": 60,
@@ -148,6 +75,7 @@ var data1 ={
   }
  ]
 };
+
 
 var data2 ={
  "name": "flare",
@@ -225,27 +153,3 @@ var data2 ={
   }
  ]
 };
-
-// var data2 = data1;
-var chart = tree();
-var config = {
-          svg_width: 1600,
-          svg_height: 800,
-          margins: {top: 30, left: 120, right: 30, bottom: 30},
-          path : true
-      };
-
-function simpleflare1(){
-  simpleflare(config, chart, data1);
-}
-
-function simpleflare2(){
-  simpleflare(config, chart, data2);
-}
-
-function simpleflare(config, chart, data){
-  chart.nodes(data).config(config).render();
-}
-</script>
-  </body>
-</html>
