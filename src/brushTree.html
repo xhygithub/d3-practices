@@ -94,16 +94,17 @@ path.link {
 </style>
 </head>
 <body>
-    <div id="body">
-      <div id="footer">
+  <div id="footer">
         d3.layout.tree
       </div>
-    </div>
+  <div id='tree-position'></div>
+  <div id='brush-position'></div>
+      
 <script type = "text/javascript">
 
 var brushConfig = {
-  domainRange: [new Date(2013, 0, 1), new Date(2013, 0, 15) - 1],
-  initialBrushSize: [new Date(2013, 0, 2), new Date(2013, 0, 3)],
+  domainRange: [new Date(2013, 0, 1), new Date(2013, 0, 5) - 1],
+  initialBrushSize: [new Date(2013, 0, 1), new Date(2013, 0, 2)],
   onChange: function(event) {
     console.log(event);
   },
@@ -114,39 +115,33 @@ var brushConfig = {
   brush: {ticks: {unit: d3.time.days, value:1}} 
 }
 
-var chart = tree();
-var chartConfig = {
-          svg_width: 1000,
-          svg_height: 800,
-          margins: {top: 30, left: 120, right: 30, bottom: 30},
-          path : true
-};
-simpleflare1();
-windowSlip(brushConfig)
+// var chart = tree();
+// var chartConfig = {
+//           svg_width: 1000,
+//           svg_height: 800,
+//           margins: {top: 30, left: 120, right: 30, bottom: 30},
+//           path : true
+// };
 
 
-// var period = windowSlip(brushConfig);
-// if(period == brushConfig.initialBrushSize){
-// 	simpleflare1();
+windowSlip(brushConfig);
+// simpleflare1();
+
+
+
+
+
+// function simpleflare1(){
+//   simpleflare(chartConfig, chart, data1);
 // }
-// else{
-// 	simpleflare2();
+
+// function simpleflare2(){
+//   simpleflare(chartConfig, chart, data2);
 // }
 
-
-
-
-function simpleflare1(){
-  simpleflare(chartConfig, chart, data1);
-}
-
-function simpleflare2(){
-  simpleflare(chartConfig, chart, data2);
-}
-
-function simpleflare(chartConfig, chart, data){
-  chart.nodes(data).config(chartConfig).render();
-}
+// function simpleflare(chartConfig, chart, data){
+//   chart.nodes(data).config(chartConfig).render();
+// }
 
 
 </script>

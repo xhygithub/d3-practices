@@ -11,7 +11,7 @@ function windowSlip(config){
       .extent(config.initialBrushSize)
       .on("brush", brushed);
 
-  var svg = d3.select("#body").append("svg")
+  var svg = d3.select("#brush-position").append("svg")
       .attr("class", "brush_svg")
       .attr("width", 960)
       .attr("height", 500)
@@ -60,6 +60,7 @@ function windowSlip(config){
   gBrush.selectAll("rect")
       .attr("height", config.height);
 
+  var chart = tree();
   function brushed() {
     var extent0 = brush.extent(),
         extent1;
@@ -70,7 +71,9 @@ function windowSlip(config){
       var d0 = d3.time.day.round(extent0[0]),
           d1 = d3.time.day.offset(d0, Math.round((extent0[1] - extent0[0]) / 864e5));
       extent1 = [d0, d1];
-      console.log(extent0,extent1);
+      period_window = d0.getDay()-2;
+      // console.log(period_window);
+    
     }
     // otherwise, if resizing, round both dates
     else {
@@ -83,10 +86,18 @@ function windowSlip(config){
         extent1[1] = d3.time.day.ceil(extent0[1]);
       }
     }
-    period_window = extent1;
+
     d3.select(this).call(brush.extent(extent1));
-    config.onChange({d3Event: d3.event});
+
+    var chartConfig = {
+              svg_width: 1000,
+              svg_height: 800,
+              margins: {top: 30, left: 120, right: 30, bottom: 30},
+              path : true,
+              slice: period_window
+    };
+    chart.nodes(data1).config(chartConfig).render();
+    // config.onChange({d3Event: d3.event});
   }
 
-  return period_window;
 }
