@@ -77,9 +77,11 @@
           min_number = Math.min.apply(null,numberArray);
           max_number = Math.max.apply(null,numberArray);
 
-          duration_scale = d3.scale.linear()
-              .domain([min_time, (max_time - min_time)/3 + min_time, (max_time - min_time)/2 + min_time,(max_time - min_time)*2/3 + min_time,max_time])
-              .range(['rgb(0,0,255)','rgb(0,255,255)', 'rgb(0,255,0)','rgb(255,255,0)','rgb(255,0,0)']);
+          // duration_scale = d3.scale.linear()
+          //     .domain([min_time, (max_time - min_time)/3 + min_time, (max_time - min_time)/2 + min_time,(max_time - min_time)*2/3 + min_time,max_time])
+          //     .range(['rgb(0,0,255)','rgb(0,255,255)', 'rgb(0,255,0)','rgb(255,255,0)','rgb(255,0,0)']);
+          duration_scale = d3.scale.linear().domain([min_time,max_time]).range([2,15]);
+          
           colors = d3.scale.linear().domain([0,max_branch]).range(['blue','orange']);
           r_scale = d3.scale.linear().domain([min_number,max_number]).range([2,20]);
           stroke_width = d3.scale.linear().domain([min_number,max_number]).range([4,40]);
@@ -148,8 +150,20 @@
         nodeEnter.append('svg:circle')
               .attr('r', function (d) { if(d.depth) return r_scale(d.number[config.slice]); return 20;})
               .style({
-                  'fill': 
-                  function (d) {if(d.depth) return duration_scale(d.duration[config.slice]);return 'black'}
+                  'fill': 'green'
+                  // function (d) {if(d.depth) return duration_scale(d.duration[config.slice]);return 'black'}
+                  ,'opacity': 1
+              });
+         nodeEnter.append('svg:circle')
+              .attr('r', 
+                function (d) { if(d.depth) return duration_scale(d.duration[config.slice]); return 25;}
+                
+                // function (d) { if(d.depth) return r_scale(d.number[config.slice]); return 20;}
+                )
+              .style({
+                  'fill': 'yellow',
+                  'opacity': 0.7
+                  // function (d) {if(d.depth) return duration_scale(d.duration[config.slice]);return 'black'}
               });
         nodeEnter.append('svg:text')
               .attr('x', function(d) { return d.children || d._children ? -10 : 10; })

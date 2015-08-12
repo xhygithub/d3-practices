@@ -1,6 +1,6 @@
 function windowSlip(config){
   var config = config;
-  var period_window  = config.initialBrushSize;
+  var period_window  = 0;
 
   var x = d3.time.scale()
       .domain(config.domainRange)
@@ -61,6 +61,15 @@ function windowSlip(config){
       .attr("height", config.height);
 
   var chart = tree();
+  var chartConfig = {
+              svg_width: 1000,
+              svg_height: 800,
+              margins: {top: 30, left: 120, right: 30, bottom: 30},
+              path : true,
+              slice: period_window
+    };
+    chart.nodes(data1).config(chartConfig).render();
+    
   function brushed() {
     var extent0 = brush.extent(),
         extent1;
@@ -89,13 +98,7 @@ function windowSlip(config){
 
     d3.select(this).call(brush.extent(extent1));
 
-    var chartConfig = {
-              svg_width: 1000,
-              svg_height: 800,
-              margins: {top: 30, left: 120, right: 30, bottom: 30},
-              path : true,
-              slice: period_window
-    };
+    chartConfig.slice = period_window;
     chart.nodes(data1).config(chartConfig).render();
     // config.onChange({d3Event: d3.event});
   }
