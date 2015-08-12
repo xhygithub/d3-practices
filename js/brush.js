@@ -1,6 +1,7 @@
-function windowSlip(config){
+function windowSlip(config, chartConfig){
   var config = config;
-  var period_window  = 0;
+  var chartConfig = chartConfig;
+  var period_window;
 
   var x = d3.time.scale()
       .domain(config.domainRange)
@@ -61,14 +62,7 @@ function windowSlip(config){
       .attr("height", config.height);
 
   var chart = tree();
-  var chartConfig = {
-              svg_width: 1000,
-              svg_height: 800,
-              margins: {top: 30, left: 120, right: 30, bottom: 30},
-              path : true,
-              slice: period_window
-    };
-    chart.nodes(data1).config(chartConfig).render();
+  chart.nodes(data1).config(chartConfig).render();
     
   function brushed() {
     var extent0 = brush.extent(),

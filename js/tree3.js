@@ -3,6 +3,7 @@
   function tree() {
 
       var m , w , h , i = 0, count = 0;
+      var number_display, duration_display;
       var tree, diagonal, vis;
       var  _nodes = root = [], instance = {};
       var second_node = {};
@@ -18,7 +19,9 @@
               h:    myConfigs.svg_height || 1000,
               m:    myConfigs.margins || {top: 30, left: 120, right: 30, bottom: 30},
               path:       myConfigs.path   || false,
-              slice:      myConfigs.slice   ||  0
+              slice:      myConfigs.slice   ||  0,
+              number_display: myConfigs.number_display || true,
+              duration_display: myConfigs.duration_display || true
           };
 
           return instance;
@@ -148,21 +151,29 @@
               });
             
         nodeEnter.append('svg:circle')
+              .attr('class', 'circle-number')
               .attr('r', function (d) { if(d.depth) return r_scale(d.number[config.slice]); return 20;})
               .style({
                   'fill': 'green'
                   // function (d) {if(d.depth) return duration_scale(d.duration[config.slice]);return 'black'}
                   ,'opacity': 1
+                  ,'display': function(d){
+                    if(!config.number_display)
+                    return 'none';}
               });
          nodeEnter.append('svg:circle')
+              .attr('class', 'circle-dureation')
               .attr('r', 
                 function (d) { if(d.depth) return duration_scale(d.duration[config.slice]); return 25;}
                 
                 // function (d) { if(d.depth) return r_scale(d.number[config.slice]); return 20;}
                 )
               .style({
-                  'fill': 'yellow',
-                  'opacity': 0.7
+                  'fill': 'yellow'
+                  ,'display': function(d){
+                    if(!config.duration_display)
+                    return 'none';}
+                  // 'display': 'none'
                   // function (d) {if(d.depth) return duration_scale(d.duration[config.slice]);return 'black'}
               });
         nodeEnter.append('svg:text')
@@ -334,7 +345,6 @@
                       if(d.source.depth == 0){ 
                           // second_node.push(d.target.id);
                           return colors(d.target.id); 
-                          console.log("....", d.target.id);
                       }
                       else {                      
                         for(var key in second_node) {

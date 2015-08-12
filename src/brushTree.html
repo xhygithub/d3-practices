@@ -73,7 +73,6 @@ path.link {
 }
 
 .angular {
-
   position: absolute;
   top:-6px;
   left: 20px;
@@ -88,19 +87,76 @@ path.link {
 
 .rect_box {
   background: white;
+}
 
+.circle-number, .circle-duration{
+  /*background: gray;*/
 }
 
 </style>
 </head>
 <body>
-  <div id="footer">
-        d3.layout.tree
+  <div id="legends">
       </div>
   <div id='tree-position'></div>
   <div id='brush-position'></div>
       
 <script type = "text/javascript">
+
+var svg = d3.select('#legends').append('svg')
+    .attr('class', 'legends-group')
+    .attr('width', 500)
+    .attr('height',20);
+var legend_number = svg.append('g').attr('transform', 'translate(1,1)');
+var number_color, duration_color, number_display = false, duration_display = true;
+legend_number.append('rect')
+    .attr('class', 'legend-clicknumber')
+    .attr('width',20)
+    .attr('height',20)
+    .style({'fill': 'green'})
+    .on('click', function (d) { 
+      var current_color = d3.select(this).style('fill');
+      if(current_color == "rgb(128, 128, 128)") {
+        d3.select(this).style('fill',number_color);
+        number_display = true;
+      }
+      else {
+        number_color = d3.select(this).style('fill');
+        d3.select(this).style('fill','rgb(128,128,128)');
+        number_display = false;
+      }
+  });
+
+
+legend_number.append('text')
+    .attr('x',20)
+    .attr('y',20)
+    .text('duration');
+
+var legend_duration = svg.append('g').attr('transform', 'translate(100,1)');
+legend_duration.append('rect')
+    .attr('class', 'legend-duration')
+    .attr('width',20)
+    .attr('height',20)
+    .style({'fill': 'yellow'})
+    .on('click', function (d) { 
+      var current_color = d3.select(this).style('fill');
+      if(current_color == "rgb(128, 128, 128)")//gray
+      {
+        d3.select(this).style('fill',duration_color);
+        duration_display = true;
+      }
+      else {
+        duration_color = d3.select(this).style('fill');
+        d3.select(this).style('fill','rgb(128,128,128)');
+        duration_display = false;
+      }
+  });
+legend_duration.append('text')
+    .attr('x',20)
+    .attr('y',20)
+    .text('duration');
+
 
 var brushConfig = {
   domainRange: [new Date(2013, 0, 1), new Date(2013, 0, 5) - 1],
@@ -115,8 +171,17 @@ var brushConfig = {
   brush: {ticks: {unit: d3.time.days, value:1}} 
 }
 
+var chartConfig = {
+            svg_width: 1000,
+            svg_height: 800,
+            margins: {top: 30, left: 120, right: 30, bottom: 30},
+            path : true,
+            slice: 0,
+            number_display: number_display,
+            duration_display: duration_display
+  };
 
-windowSlip(brushConfig);
+windowSlip(brushConfig, chartConfig);
 // simpleflare1();
 
 
