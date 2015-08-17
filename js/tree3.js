@@ -1,6 +1,6 @@
 
 
-  function tree() {
+function tree() {
 
       var m , w , h , i = 0, count = 0;
       var number_display, duration_display;
@@ -15,13 +15,14 @@
       instance.config = function (myConfigs) {
 
           config = {
-              w:    myConfigs.svg_width || 200,
-              h:    myConfigs.svg_height || 1000,
+              w:    myConfigs.tree_width || 200,
+              h:    myConfigs.tree_height || 1000,
               m:    myConfigs.margins || {top: 30, left: 120, right: 30, bottom: 30},
               path:       myConfigs.path   || false,
-              slice:      myConfigs.slice   ||  0,
-              number_display: myConfigs.number_display || true,
-              duration_display: myConfigs.duration_display || true
+              slice_start:      myConfigs.slice_start   ||  0,
+              slice_end:        myConfigs.slice_end     ||  1,
+              number_display: myConfigs.number_display || false,
+              duration_display: myConfigs.duration_display || false
           };
 
           return instance;
@@ -31,69 +32,147 @@
           if (!arguments.length) return _nodes;
           _nodes = n;
           root = n;
+          _nodes.x0 = config.w / 2;
+          _nodes.y0 = 0;
+
           return instance;
       };
 
+
+      instance.initial = function () {
+
+        tree = d3.layout.tree()
+            .size([config.h, config.w]);
+
+        diagonal = d3.svg.diagonal()
+            .projection(function(d) { return [d.y, d.x];});
+
+        vis = d3.select('#tree-position').append('svg:svg')
+            .attr('class', 'tree_svg')
+            .attr('width', config.w + config.m.left + config.m.right)
+            .attr('height', config.h + config.m.top + config.m.bottom )
+            .append('svg:g')
+            .attr('transform', 'translate(' + config.m.left + ',' + config.m.top+ ')');
+
+
+        var nodes = tree.nodes(root);        
+        var max_branch = nodes.length,
+            max_number , 
+            min_number, 
+            max_time , 
+            min_time ;
+        var timeArray = [], numberArray = [];
+
+        nodes.forEach(function (d) {
+            if(d.depth) {
+              var sum_number = 0, sum_duration = 0;
+              for(var i = 0; i < d.number.length; i++){
+                sum_number += d.number[i];
+                sum_duration += d.duration[i];
+                timeArray.push(d.number[i]);
+                numberArray.push(d.duration[i]);
+
+              }
+              // timeArray.push(sum_duration);
+              // numberArray.push(sum_number);
+            }
+        });
+        // console.log(nodes);
+        max_time = Math.max.apply(null, timeArray);
+        min_time = Math.min.apply(null,timeArray);
+        min_number = Math.min.apply(null,numberArray);
+        max_number = Math.max.apply(null,numberArray);
+
+        duration_scale = d3.scale.linear().domain([min_time,max_time]).range([2,25]);
+        
+        colors = d3.scale.linear().domain([0,max_branch]).range(['blue','orange']);
+        r_scale = d3.scale.linear().domain([min_number,max_number]).range([2,25]);
+        stroke_width = d3.scale.linear().domain([min_number,max_number]).range([4,50]);
+
+        return instance;
+      }
+
       instance.render = function () {
 
-          _nodes.x0 = config.h / 2;
-          _nodes.y0 = 0;
-
-          tree = d3.layout.tree()
-              .size([config.h, config.w]);
-
-          diagonal = d3.svg.diagonal()
-              .projection(function(d) { return [d.y, d.x];});
+          initialRender(_nodes);
           
-          // if(vis) vis.remove();
-          d3.selectAll('svg.tree_svg').remove();
-          // if(!vis) {
-              vis = d3.select('#tree-position').append('svg:svg')
-                  .attr('class', 'tree_svg')
-                  .attr('width', config.w + config.m.left + config.m.right)
-                  .attr('height', config.h + config.m.top + config.m.bottom)
-                  .append('svg:g')
-                  .attr('transform', 'translate(' + config.m.left + ',' + config.m.top + ')');
-          // }
-          if(!count) getAllScale(_nodes);
-          render();
+      };
+      instance.update = function () {
+
+          change(_nodes);
           
       };
 
-      function getAllScale(_nodes) {
-          count = 1;
-          var nodes = tree.nodes(root);        
-          var max_branch = nodes.length,
-              max_number, 
-              min_number, 
-              max_time, 
-              min_time;
-          var timeArray = [], numberArray = [];
-          nodes.forEach(function (d) {
-              if(d.depth) {
-                  timeArray.push(d.duration[config.slice]);
-                  numberArray.push(d.number[config.slice]);
+      function change(_nodes){
+        var nodes = tree.nodes(_nodes).reverse();
+        vis.selectAll('circle.circle-number')
+            .transition()
+            .duration(500)
+            .attr('r', function(d) {
+              if(!d.depth)
+                return 20;
+              else {
+                var sum_number = 0;
+                for(var i = config.slice_start; i < config.slice_end; i++){
+                  sum_number += d.number[i];
+                }
+                return r_scale(sum_number); 
               }
-          });
-          max_time = Math.max.apply(null, timeArray);
-          min_time = Math.min.apply(null,timeArray);
-          min_number = Math.min.apply(null,numberArray);
-          max_number = Math.max.apply(null,numberArray);
+            })
+            .style({
+              'opacity': function(d) {if(!config.number_display) return 0; return 1;}            
+ 
+            });
+        vis.selectAll('circle.circle-duration')
+            .transition()
+            .duration(500)
+            .attr('r' , function(d) { 
+              if(!d.depth) return 20;
+              else {
+                var sum_duration = 0;
+                for(var i = config.slice_start; i < config.slice_end; i++){
+                  sum_duration += d.duration[i];
+                }
+                return r_scale(sum_duration); 
+              }           
+            })
+            .style({
+              'opacity': function(d) {if(!config.duration_display) return 0; return 0.8;}            
+            });
 
-          // duration_scale = d3.scale.linear()
-          //     .domain([min_time, (max_time - min_time)/3 + min_time, (max_time - min_time)/2 + min_time,(max_time - min_time)*2/3 + min_time,max_time])
-          //     .range(['rgb(0,0,255)','rgb(0,255,255)', 'rgb(0,255,0)','rgb(255,255,0)','rgb(255,0,0)']);
-          duration_scale = d3.scale.linear().domain([min_time,max_time]).range([2,15]);
-          
-          colors = d3.scale.linear().domain([0,max_branch]).range(['blue','orange']);
-          r_scale = d3.scale.linear().domain([min_number,max_number]).range([2,20]);
-          stroke_width = d3.scale.linear().domain([min_number,max_number]).range([4,40]);
+         
+        vis.selectAll('path.link')
+          .transition()
+          .duration(500)
+          .style({'stroke-width': function(d) { 
+            if(!config.path)
+              return 2;
+            else{
+              var sum_number = 0, sum_duration = 0;
+              for(var i = config.slice_start; i < config.slice_end; i++){
+                sum_number += d.target.number[i];
+                sum_duration += d.target.duration[i];
+              }
+              if(config.number_display && config.duration_display) {
+                if(sum_number > sum_duration){                    
+                  return stroke_width(sum_number).toString();
+                }
+                return stroke_width(sum_duration).toString();
+              }else if(config.number_display){     
+                return stroke_width(sum_number).toString();
+
+              }
+              return stroke_width(sum_duration).toString();
+            }
+
+          }});
+
+
       }
 
-      function render() {
-          i = 0;
+      function initialRender() {
+          // i = 0;
           var nodes = tree.nodes(_nodes).reverse();
-
           nodes.forEach(function(d) { d.y = d.depth * 180; });
 
           var node = vis.selectAll('g.node')
@@ -139,43 +218,54 @@
                       .attr('class', 'text')
                       .text('name:' + d.name);
                   if(d.depth){
-
+                      
+                    var sum_duration = 0, sum_number = 0;
+                    for(var i = config.slice_start; i < config.slice_end; i++){
+                      sum_duration += d.duration[i];
+                      sum_number += d.number[i];
+                    }
+                
                   var information2 = box.append('div')
                       .attr('class', 'text')
-                      .text('number:' + d.number[config.slice]);
+                      .text('number:' + sum_number);
 
                   var information3 = box.append('div')
                       .attr('class', 'text')
-                      .html('duration:' + d.duration[config.slice]);                    
+                      .html('duration:' + sum_duration);                    
                   }
               });
-            
         nodeEnter.append('svg:circle')
               .attr('class', 'circle-number')
-              .attr('r', function (d) { if(d.depth) return r_scale(d.number[config.slice]); return 20;})
+              .attr('r', function (d) { 
+                if(d.depth) {
+                  var sum_number = 0;
+                  for(var i = config.slice_start; i < config.slice_end; i++){
+                    sum_number += d.number[i];
+                  }
+                  return r_scale(sum_number); 
+                }
+                return 20;
+              })
               .style({
-                  'fill': 'green'
-                  // function (d) {if(d.depth) return duration_scale(d.duration[config.slice]);return 'black'}
-                  ,'opacity': 1
-                  ,'display': function(d){
-                    if(!config.number_display)
-                    return 'none';}
-              });
-         nodeEnter.append('svg:circle')
-              .attr('class', 'circle-dureation')
-              .attr('r', 
-                function (d) { if(d.depth) return duration_scale(d.duration[config.slice]); return 25;}
-                
-                // function (d) { if(d.depth) return r_scale(d.number[config.slice]); return 20;}
-                )
+                'fill': function(d) {if(!d.depth) return 'black'; return 'green';}
+            });
+
+        nodeEnter.append('svg:circle')
+              .attr('class', 'circle-duration')
+              .attr('r', function (d) { 
+                if(d.depth) {
+                  var sum_duration = 0;
+                  for(var i = config.slice_start; i < config.slice_end; i++){
+                    sum_duration += d.duration[i];
+                  }
+                  return r_scale(sum_duration); 
+                }
+                return 20;
+              })
               .style({
-                  'fill': 'yellow'
-                  ,'display': function(d){
-                    if(!config.duration_display)
-                    return 'none';}
-                  // 'display': 'none'
-                  // function (d) {if(d.depth) return duration_scale(d.duration[config.slice]);return 'black'}
-              });
+                'fill': function(d) {if(!d.depth) return 'black'; return 'yellow';}
+                ,'opacity': 0.8
+            });
         nodeEnter.append('svg:text')
               .attr('x', function(d) { return d.children || d._children ? -10 : 10; })
               .attr('dy', '.35em')
@@ -220,8 +310,26 @@
                   }
                   ,'stroke-width': function (d, i) { 
                       if(!config.path) return 2;
-                      return stroke_width(d.target.number[config.slice]).toString();
+                      else{
+                        var sum_number = 0, sum_duration = 0;
+                        for(var i = config.slice_start; i < config.slice_end; i++){
+                          sum_number += d.target.number[i];
+                          sum_duration += d.target.duration[i];
+                        }
+                        if(config.number_display && config.duration_display) {
+                          if(sum_number > sum_duration){                    
+                            return stroke_width(sum_number).toString();
+                          }
+                          return stroke_width(sum_duration).toString();
+                        }else if(config.number_display){     
+                          return stroke_width(sum_number).toString();
+
+                        }
+                        return stroke_width(sum_duration).toString();
+                      }
+                      
                   }
+
               });
       }
 
@@ -280,20 +388,58 @@
                   var information1 = box.append('div')
                       .attr('class', 'text')
                       .text('name:' + d.name);
-
+                  if(d.depth){
+                    var sum_duration = 0, sum_number = 0;
+                    for(var i = config.slice_start; i < config.slice_end; i++){
+                      sum_duration += d.duration[i];
+                      sum_number += d.number[i];
+                    }
                   var information2 = box.append('div')
                       .attr('class', 'text')
-                      .text('number: ' + d.number[config.slice]);
+                      .text('number: ' + sum_number);
 
                   var information3 = box.append('div')
                       .attr('class', 'text')
-                      .html('duration:' + d.duration[config.slice]);
+                      .html('duration:' + sum_duration);
+                  }
               });
             
 
         nodeEnter.append('svg:circle')
-              .attr('r', 1e-6);
+              .attr('class', 'circle-number')
+              .attr('r', function (d) { 
+                if(d.depth) {
+                  var sum_number = 0;
+                  for(var i = config.slice_start; i < config.slice_end; i++){
+                    sum_number += d.number[i];
+                  }
+                  return r_scale(sum_number); 
+                }
+                return 20;}
+              )
+              .style({
+                'fill': 'green',
+                'opacity': function(d) {if(!config.number_display) return 0;return 1;}
+           
+            });
 
+        nodeEnter.append('svg:circle')
+              .attr('class', 'circle-duration')
+              .attr('r', function (d){ 
+                if(d.depth) {
+                  var sum_duration = 0;
+                  for(var i = config.slice_start; i < config.slice_end; i++){
+                    sum_duration += d.duration[i];
+                  }
+                  return r_scale(sum_duration); 
+                }
+                return 20;}
+              )
+              .style({'fill':'yellow',
+                'opacity': function(d) {if(!config.duration_display) return 0; return 1;}
+           
+            });
+    
         nodeEnter.append('svg:text')
               .attr('x', function(d) { return d.children || d._children ? -10 : 10; })
               .attr('dy', '.35em')
@@ -306,15 +452,10 @@
               .duration(duration)
               .attr('transform', function(d) { return 'translate(' + d.y + ',' + d.x + ')'; });
 
-        nodeUpdate.select('circle')
-              .attr('r', function (d) { if(d.depth) return r_scale(d.number[config.slice]); return 20;})
-              .style({
-                  'fill': 
-                  function (d) {if(d.depth) return duration_scale(d.duration[config.slice]);return 'black'}
-              });
-
         nodeUpdate.select('text')
               .style('fill-opacity', 1);
+
+        
 
         // Transition exiting nodes to the parent's new position.
         var nodeExit = node.exit().transition()
@@ -369,7 +510,24 @@
                   }
                   ,'stroke-width': function (d, i) { 
                       if(!config.path) return 2;
-                      return stroke_width(d.target.number[config.slice]).toString();
+                      else{
+                        var sum_number = 0, sum_duration = 0;
+                        for(var i = config.slice_start; i < config.slice_end; i++){
+                          sum_number += d.target.number[i];
+                          sum_duration += d.target.duration[i];
+                        }
+                        if(config.number_display && config.duration_display) {
+                          if(sum_number > sum_duration){                    
+                            return stroke_width(sum_number).toString();
+                          }
+                          return stroke_width(sum_duration).toString();
+                        }else if(config.number_display){     
+                          return stroke_width(sum_number).toString();
+
+                        }
+                        return stroke_width(sum_duration).toString();
+                      }
+                      
                   }
               });
 
@@ -412,4 +570,5 @@
       }
 
       return instance;
-  }
+  
+}

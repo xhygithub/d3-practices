@@ -105,57 +105,11 @@ path.link {
 
 var svg = d3.select('#legends').append('svg')
     .attr('class', 'legends-group')
-    .attr('width', 500)
+    .attr('width', 700)
     .attr('height',20);
 var legend_number = svg.append('g').attr('transform', 'translate(1,1)');
-var number_color, duration_color, number_display = false, duration_display = true;
-legend_number.append('rect')
-    .attr('class', 'legend-clicknumber')
-    .attr('width',20)
-    .attr('height',20)
-    .style({'fill': 'green'})
-    .on('click', function (d) { 
-      var current_color = d3.select(this).style('fill');
-      if(current_color == "rgb(128, 128, 128)") {
-        d3.select(this).style('fill',number_color);
-        number_display = true;
-      }
-      else {
-        number_color = d3.select(this).style('fill');
-        d3.select(this).style('fill','rgb(128,128,128)');
-        number_display = false;
-      }
-  });
-
-
-legend_number.append('text')
-    .attr('x',20)
-    .attr('y',20)
-    .text('duration');
-
-var legend_duration = svg.append('g').attr('transform', 'translate(100,1)');
-legend_duration.append('rect')
-    .attr('class', 'legend-duration')
-    .attr('width',20)
-    .attr('height',20)
-    .style({'fill': 'yellow'})
-    .on('click', function (d) { 
-      var current_color = d3.select(this).style('fill');
-      if(current_color == "rgb(128, 128, 128)")//gray
-      {
-        d3.select(this).style('fill',duration_color);
-        duration_display = true;
-      }
-      else {
-        duration_color = d3.select(this).style('fill');
-        d3.select(this).style('fill','rgb(128,128,128)');
-        duration_display = false;
-      }
-  });
-legend_duration.append('text')
-    .attr('x',20)
-    .attr('y',20)
-    .text('duration');
+var number_color = 'green', duration_color = 'yellow', legends_color = 'blue', number_display = true, duration_display = true;
+var legendSelect = true;
 
 
 var brushConfig = {
@@ -164,41 +118,102 @@ var brushConfig = {
   onChange: function(event) {
     console.log(event);
   },
-  width: 960,
-  height: 100,
-  margin: {top: 200, right: 40, bottom: 10, left: 40},
+  brush_width: 800,
+  brush_height: 80,
+  margin: {top: 10, right: 230, bottom: 30, left: 200},
   axis: {ticks : {unit: d3.time.hours, value:12}},
   brush: {ticks: {unit: d3.time.days, value:1}} 
 }
 
 var chartConfig = {
-            svg_width: 1000,
-            svg_height: 800,
-            margins: {top: 30, left: 120, right: 30, bottom: 30},
+            tree_width: 1000,
+            tree_height: 800,
+            margins: {top: 30, left: 200, right: 30, bottom: 30},
             path : true,
-            slice: 0,
+            slice_start: 0,
+            slice_end: 4,
             number_display: number_display,
             duration_display: duration_display
   };
 
-windowSlip(brushConfig, chartConfig);
-// simpleflare1();
+var chart = tree();
+
+chart.config(chartConfig).nodes(data1).initial();
+chart.render();
+windowSlip(brushConfig, chartConfig, chart);
+
+    console.log(data1);
+
+legend_number.append('rect')
+    .attr('class', 'legend legend-clicknumber')
+    .attr('width',20)
+    .attr('height',20)
+    .style({'fill': 'rgb(128, 128, 128)'})
+    .on('click', function (d) { 
+      var current_color = d3.select(this).style('fill');
+      if(current_color == "rgb(128, 128, 128)") {
+        d3.selectAll('rect.legend').style('fill','rgb(128,128,128)');
+        d3.select(this).style('fill',number_color);
+        chartConfig.number_display = true;
+        chartConfig.duration_display = false;
+      }
+      chart.config(chartConfig).update();
+  });
 
 
+legend_number.append('text')
+    .attr('x',30)
+    .attr('y',15)
+    .text('number');
 
 
+//duration
+var legend_duration = svg.append('g').attr('transform', 'translate(100,1)');
+legend_duration.append('rect')
+    .attr('class', 'legend legend-duration')
+    .attr('width',20)
+    .attr('height',20)
+    .style({'fill': 'rgb(128, 128, 128)'})
+    .on('click', function (d) { 
+      var current_color = d3.select(this).style('fill');
+      if(current_color == "rgb(128, 128, 128)")//gray
+      {
+        d3.selectAll('rect.legend').style('fill','rgb(128,128,128)');
+        d3.select(this).style('fill',duration_color);
+        chartConfig.duration_display = true;
+        chartConfig.number_display = false;
+      }
+    
+      chart.config(chartConfig).update();
+  });
+legend_duration.append('text')
+    .attr('x',30)
+    .attr('y',15)
+    .text('duration');
 
-// function simpleflare1(){
-//   simpleflare(chartConfig, chart, data1);
-// }
 
-// function simpleflare2(){
-//   simpleflare(chartConfig, chart, data2);
-// }
-
-// function simpleflare(chartConfig, chart, data){
-//   chart.nodes(data).config(chartConfig).render();
-// }
+//both
+var legend_duration = svg.append('g').attr('transform', 'translate(200,1)');
+legend_duration.append('rect')
+    .attr('class', 'legend legends-both')
+    .attr('width',20)
+    .attr('height',20)
+    .style({'fill': 'blue'})
+    .on('click', function (d) { 
+      var current_color = d3.select(this).style('fill');
+      if(current_color == "rgb(128, 128, 128)")//gray
+      {
+        d3.selectAll('rect.legend').style('fill','rgb(128,128,128)'); 
+        d3.select(this).style('fill',legends_color);
+        chartConfig.duration_display = true;
+        chartConfig.number_display = true;
+      }
+      chart.config(chartConfig).update();
+  });
+legend_duration.append('text')
+    .attr('x',30)
+    .attr('y',15)
+    .text('both');
 
 
 </script>

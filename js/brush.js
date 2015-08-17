@@ -1,11 +1,12 @@
-function windowSlip(config, chartConfig){
+function windowSlip(config, chartConfig, chart){
   var config = config;
   var chartConfig = chartConfig;
   var period_window;
+  var chart = chart;
 
   var x = d3.time.scale()
       .domain(config.domainRange)
-      .range([0, config.width]);
+      .range([0, config.brush_width]);
 
   var brush = d3.svg.brush()
       .x(x)
@@ -14,26 +15,26 @@ function windowSlip(config, chartConfig){
 
   var svg = d3.select("#brush-position").append("svg")
       .attr("class", "brush_svg")
-      .attr("width", 960)
-      .attr("height", 500)
+      .attr("width", config.brush_width + config.margin.left + config.margin.right)
+      .attr("height", config.brush_height + config.margin.top + config.margin.bottom)
       .append("g")
-      .attr("transform", "translate(" + 40 + "," + 50 + ")");
+      .attr("transform", "translate(" + config.margin.left/2 + "," + config.margin.top + ")");
 
   svg.append("rect")//背景矩形
       .attr("class", "grid-background")
-      .attr("width", config.width)
-      .attr("height", config.height);
+      .attr("width", config.brush_width)
+      .attr("height", config.brush_height);
 
   svg.append("g")
       .attr("class", "x grid")
-      .attr("transform", "translate(0," + config.height + ")")
+      .attr("transform", "translate(0," + config.brush_height + ")")
       .call(
         d3.svg.axis()
           .scale(x)
           .orient("bottom")
           .ticks(config.axis.ticks.unit, config.axis.ticks.value)
           //定义ticks值取值范围，以1/2天为单位,也就是12小时
-          .tickSize(-config.height)
+          .tickSize(-config.brush_height)
           .tickFormat("")
       )
       .selectAll(".tick")
@@ -41,7 +42,7 @@ function windowSlip(config, chartConfig){
 
   svg.append("g")
       .attr("class", "x axis")
-      .attr("transform", "translate(0," + config.height + ")")
+      .attr("transform", "translate(0," + config.brush_height + ")")
       .call(
         d3.svg.axis()
           .scale(x) //x定义时间范围，也就是x轴范围以及x值
@@ -59,10 +60,8 @@ function windowSlip(config, chartConfig){
       .call(brush);
 
   gBrush.selectAll("rect")
-      .attr("height", config.height);
+      .attr("height", config.brush_height);
 
-  var chart = tree();
-  chart.nodes(data1).config(chartConfig).render();
     
   function brushed() {
     var extent0 = brush.extent(),
@@ -74,8 +73,6 @@ function windowSlip(config, chartConfig){
       var d0 = d3.time.day.round(extent0[0]),
           d1 = d3.time.day.offset(d0, Math.round((extent0[1] - extent0[0]) / 864e5));
       extent1 = [d0, d1];
-      period_window = d0.getDay()-2;
-      // console.log(period_window);
     
     }
     // otherwise, if resizing, round both dates
@@ -91,9 +88,16 @@ function windowSlip(config, chartConfig){
     }
 
     d3.select(this).call(brush.extent(extent1));
+         period_window = extent1[0].getDay();
+      // console.log(extent1[0].getDay()-2,extent1[1].getDay()-2);
+    var data = data1;
+    var start = extent1[0].getDay()-2,
+        end = extent1[1].getDay()-2;
 
-    chartConfig.slice = period_window;
-    chart.nodes(data1).config(chartConfig).render();
+
+    chartConfig.slice_start = start;
+    chartConfig.slice_end = end;
+    chart.config(chartConfig).nodes(data1).update();
     // config.onChange({d3Event: d3.event});
   }
 
