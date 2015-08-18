@@ -4,7 +4,7 @@
 
 <script src="../lib/d3.js"></script>
 <script type="text/javascript" src="../js/brush.js"></script>
-<script type="text/javascript" src="../js/tree3.js"></script>
+<script type="text/javascript" src="../js/tree.js"></script>
 <script type="text/javascript" src="../data/simple-flare.js"></script>
 
 
@@ -194,11 +194,32 @@ legend_duration.append('text')
 
 //both
 var legend_duration = svg.append('g').attr('transform', 'translate(200,1)');
+
+var gradient = svg.append("svg:defs")
+  .append("svg:linearGradient")
+    .attr("id", "gradient")
+    .attr("x1", "0%")
+    .attr("y1", "0%")
+    .attr("x2", "100%")
+    .attr("y2", "100%")
+    .attr("spreadMethod", "pad");
+
+gradient.append("svg:stop")
+    .attr("offset", "0%")
+    .attr("stop-color", "green")
+    .attr("stop-opacity", 1);
+
+gradient.append("svg:stop")
+    .attr("offset", "100%")
+    .attr("stop-color", "yellow")
+    .attr("stop-opacity", 1);
+
+legends_color = 'url(#gradient)';
 legend_duration.append('rect')
     .attr('class', 'legend legends-both')
     .attr('width',20)
     .attr('height',20)
-    .style({'fill': 'blue'})
+    .style({'fill': legends_color})
     .on('click', function (d) { 
       var current_color = d3.select(this).style('fill');
       if(current_color == "rgb(128, 128, 128)")//gray
